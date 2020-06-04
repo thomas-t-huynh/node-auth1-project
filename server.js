@@ -1,5 +1,6 @@
 const express = require('express')
 const session = require('express-session')
+const cors = require('cors')
 const knexSessionStore = require('connect-session-knex')(session)
 
 const userRouter = require('./users/users-router')
@@ -29,6 +30,7 @@ const sessionConfig = {
 
 const server = express()
 
+server.use(cors())
 server.use(express.json())
 server.use(session(sessionConfig))
 server.use(auth)

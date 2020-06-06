@@ -1,15 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import axios from 'axios'
 
 const initData = { username: "thom27", password: "secretword123", repassword: "secretword123" }
 
 function App() { 
+
   const [credentials, setCredentials] = useState(initData)
-  const [user, setUser] = useState()
-  const [route, setRoute] = useState('register')
+  const [users, setUsers] = useState()
+  const [route, setRoute] = useState()
   const [status, setStatus] = useState()
+  
+  useEffect(() => {
+    if (route === 'users') {
+      axios.get('http://localhost:5000/api/users/')
+        .then(res => {
+          setUsers(res.data)
+          setStatus(undefined)
+          setCredentials(initData)
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err)
+          setStatus('Error handling request')
+      })
+    }
+  }, [route])
+  
   const handleOnChange = e => { setCredentials({...credentials, [e.target.name]: e.target.value }) }
   const handleOnSubmit = e => {
     e.preventDefault()
@@ -20,7 +37,6 @@ function App() {
       }
       axios.post('http://localhost:5000/api/auth/register', { username, password })
         .then(res => {
-          setUser(res.data.username)
           setRoute('login')
           setStatus(undefined)
           setCredentials(initData)
@@ -34,6 +50,7 @@ function App() {
       axios.post('http://localhost:5000/api/auth/login', { username, password })
         .then(res => {
           console.log(res)
+          setRoute('users')
           setStatus(undefined)
           setCredentials(initData)
         })
@@ -42,9 +59,20 @@ function App() {
           setStatus('Wrong credentials')
         })
     }
-
   }
-  if (route === 'register') {
+  const handleLogOut = () => {
+    axios.get('http://localhost:5000/api/users/logout')
+      .then(res => {
+        console.log(res)
+        setRoute("")
+        setStatus(undefined)
+      })
+      .catch(err => {
+        setStatus("Uh... idk what happened")
+        console.log(err)
+      })
+  }
+  if (!route) {
     return (
       <div>
         <form className="App" onSubmit={handleOnSubmit} name="register">
@@ -86,6 +114,15 @@ function App() {
       </form>
     )
   }
+  if (route === 'users') {
+    return (
+      <div>
+        <button onClick={() => handleLogOut()}>Logout</button>
+        {users && users.map((user, i) => <h2 key={i}>{user.username}</h2>)}
+      </div>
+    )
+  }
 }
+
 
 export default App;

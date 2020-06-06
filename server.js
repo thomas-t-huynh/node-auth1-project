@@ -15,8 +15,8 @@ const sessionConfig = {
     cookie: {
         maxAge: 1000 * 60 * 60,
         secure: false,
-        httpOnly: true
     },
+    httpOnly: false,
     resave: false,
     saveUninitialized: false,
     store: new knexSessionStore({
@@ -34,6 +34,8 @@ server.use(cors())
 server.use(express.json())
 server.use(session(sessionConfig))
 server.use(auth)
+
+
 
 server.use('/api/users', userRouter)
 server.use('/api/auth', authRouter)

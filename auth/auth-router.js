@@ -22,7 +22,7 @@ router.post('/login', async (req, res) => {
     try {
         const user = await Auth.findBy(username).first()
         if (user && bcrypt.compareSync(password, user.password)) {
-            req.session.user = user
+            req.session.username = user.username
             res.status(200).json({message: 'welcome to the jungle, ' + username })
         } else {
             res.status(401).json({ message: 'wrong credentials' })
